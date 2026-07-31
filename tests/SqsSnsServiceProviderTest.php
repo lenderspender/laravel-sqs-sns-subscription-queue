@@ -34,7 +34,6 @@ class SqsSnsServiceProviderTest extends TestCase
     {
         $reflectionQueueManager = new \ReflectionClass($this->app['queue']);
         $reflectionQueueManagerGetConnectorMethod = $reflectionQueueManager->getMethod('getConnector');
-        $reflectionQueueManagerGetConnectorMethod->setAccessible(true);
 
         $connector = $reflectionQueueManagerGetConnectorMethod->invoke(
             $this->app['queue'],
