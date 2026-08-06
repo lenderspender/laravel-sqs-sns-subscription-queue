@@ -2,6 +2,8 @@
 
 namespace Joblocal\LaravelSqsSnsSubscriptionQueue\Tests;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
@@ -11,14 +13,13 @@ use Joblocal\LaravelSqsSnsSubscriptionQueue\Queue\Jobs\SqsSnsJob;
 
 class SqsSnsQueueTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private $sqsClient;
 
-    protected function setUp():void
+    protected function setUp(): void
     {
-        $this->sqsClient = $this->getMockBuilder(SqsClient::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['receiveMessage'])
-            ->getMock();
+        $this->sqsClient = Mockery::mock(SqsClient::class);
     }
 
     public function testCanInstantiateQueue()
@@ -36,7 +37,6 @@ class SqsSnsQueueTest extends TestCase
 
         $queueReflection = new \ReflectionClass($queue);
         $routeReflectionProperty = $queueReflection->getProperty('routes');
-        $routeReflectionProperty->setAccessible(true);
 
         $this->assertEquals([
             "Subject#action" => '\\Job',
@@ -45,14 +45,14 @@ class SqsSnsQueueTest extends TestCase
 
     public function testWillCallReceiveMessage()
     {
-        $this->sqsClient->expects($this->once())
-            ->method('receiveMessage')
-            ->willReturn([
+        $this->sqsClient
+            ->expects('receiveMessage')
+            ->andReturn([
                 'Messages' => [],
             ]);
 
         $queue = new SqsSnsQueue($this->sqsClient, 'default_queue');
-        $queue->setContainer($this->createMock(Container::class));
+        $queue->setContainer($this->createStub(Container::class));
 
         $queue->pop();
     }
@@ -72,17 +72,19 @@ class SqsSnsQueueTest extends TestCase
             'Body' => $body,
         ];
 
-        $this->sqsClient->method('receiveMessage')->willReturn([
-            'Messages' => [
-                $message,
-            ],
-        ]);
+        $this->sqsClient
+            ->expects('receiveMessage')
+            ->andReturn([
+                'Messages' => [
+                    $message,
+                ],
+            ]);
 
         $queue = new SqsSnsQueue($this->sqsClient, 'default_queue', '', [
             "Subject#action" => '\\Job',
         ]);
 
-        $queue->setContainer($this->createMock(\Illuminate\Container\Container::class));
+        $queue->setContainer($this->createStub(Container::class));
 
         $job = $queue->pop();
         $expectedRawBody = [

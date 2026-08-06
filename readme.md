@@ -3,7 +3,7 @@
 [![Downloads](https://img.shields.io/packagist/dt/joblocal/laravel-sqs-sns-subscription-queue.svg)](https://packagist.org/packages/joblocal/laravel-sqs-sns-subscription-queue)
 [![Version](https://img.shields.io/packagist/v/joblocal/laravel-sqs-sns-subscription-queue.svg)](https://packagist.org/packages/joblocal/laravel-sqs-sns-subscription-queue)
 
-A simple extension to the [Illuminate/Queue](https://github.com/illuminate/queue) queue system used in [Laravel](https://laravel.com) and [Lumen](https://lumen.laravel.com/).
+A simple extension to the [Illuminate/Queue](https://github.com/illuminate/queue) queue system used in [Laravel](https://laravel.com).
 
 Using this connector allows [SQS](https://aws.amazon.com/sqs/) messages originating from a [SNS](https://aws.amazon.com/sns/) subscription to be worked on with Illuminate\Queue\Jobs\SqsJob.
 
@@ -14,28 +14,24 @@ Understand that this package will not handle publishing to SNS, please use the [
 
 ## Requirements
 
--   Laravel (tested with version 5.8)
--   or Lumen (tested with version 5.8)
+-   PHP 8.3 or higher
+-   Laravel 13
+
+Lumen is not supported. Lumen was discontinued upstream at v11, so no Lumen
+release can satisfy `illuminate/* ^13.0`.
 
 
 ## Usage
 
 Add the LaravelSqsSnsSubscriptionQueue ServiceProvider to your application.
+See [Registering Service Providers](https://laravel.com/docs/13.x/providers#registering-providers).
 
-
-### Laravel
-[Registering Service Providers in Laravel](https://laravel.com/docs/5.6/providers#registering-providers)
 ```php
-'providers' => [
+// bootstrap/providers.php
+return [
     // ...
     Joblocal\LaravelSqsSnsSubscriptionQueue\SqsSnsServiceProvider::class,
-],
-```
-
-### Lumen
-[Registering Service Providers in Lumen](https://lumen.laravel.com/docs/5.6/providers#registering-providers)
-```php
-$app->register(Joblocal\LaravelSqsSnsSubscriptionQueue\SqsSnsServiceProvider::class);
+];
 ```
 
 
